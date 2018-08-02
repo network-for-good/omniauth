@@ -165,11 +165,7 @@ module OmniAuth
     # Duplicates this instance and runs #call! on it.
     # @param [Hash] The Rack environment.
     def call(env)
-      t = (Time.now.to_f * 1000).to_i
-      Rails.logger.info "Omniauth #call started for #{self.class}"
       dup.call!(env)
-      t2 = (Time.now.to_f * 1000).to_i
-      Rails.logger.info "Omniauth #call ended for #{self.class} in #{t2 - t} ms"
     end
 
     # The logic for dispatching any additional actions that need
@@ -183,6 +179,9 @@ module OmniAuth
         raise(error)
       end
 
+      t = (Time.now.to_f * 1000).to_i
+      Rails.logger.info "Omniauth #call! started for #{self.class}"
+
       @env = env
       @env['omniauth.strategy'] = self if on_auth_path?
 
@@ -191,6 +190,8 @@ module OmniAuth
       return request_call if on_request_path? && OmniAuth.config.allowed_request_methods.include?(request.request_method.downcase.to_sym)
       return callback_call if on_callback_path?
       return other_phase if respond_to?(:other_phase)
+      t2 = (Time.now.to_f * 1000).to_i
+      Rails.logger.info "Omniauth #call! ended for #{self.class} in #{t2 - t} ms"
       @app.call(env)
     end
 
