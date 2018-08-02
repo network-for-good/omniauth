@@ -165,7 +165,11 @@ module OmniAuth
     # Duplicates this instance and runs #call! on it.
     # @param [Hash] The Rack environment.
     def call(env)
+      t = (Time.now.to_f * 1000).to_i
+      Rails.logger.info "Omniauth #call started for #{self.class}"
       dup.call!(env)
+      t2 = (Time.now.to_f * 1000).to_i
+      Rails.logger.info "Omniauth #call ended for #{self.class} in #{t2 - t} ms"
     end
 
     # The logic for dispatching any additional actions that need
